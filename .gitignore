@@ -1,0 +1,10 @@
+# Build and config files #
+build
+*.class
+*.xml
+# Package files #
+*.jar
+*.war
+*.ear
+# OS files #
+*.DS_Store
