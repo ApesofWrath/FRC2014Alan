@@ -1,7 +1,7 @@
 /**
 2014 Team 668 reprogram of Alan in Java
 
-Driver stick 1 interchangible with driver stick 2
+Driver stick 1 interchangeable with driver stick 2
 2 : Shift Down
 3 : Shift Up
 4: Auto Aim same as 5
@@ -9,7 +9,7 @@ Driver stick 1 interchangible with driver stick 2
 8 : Arcade
 9 : Tank
 
-Driver stick 1 interchangible with driver stick 2
+Driver stick 1 interchangeable with driver stick 2
 2 : Shift Down
 3 : Shift Up
 4 : Auto Aim same as 5
@@ -48,12 +48,17 @@ import edu.wpi.first.wpilibj.Compressor;
  * directory.
  */
 public class alan extends SimpleRobot {
-    final int frontRightTalonPort = 6;
+    final int frontRightTalonPort = 5;
     final int frontLeftTalonPort = 2;
-    final int backRightTalonPort = 5;
+    final int backRightTalonPort = 8;
     final int backLeftTalonPort = 1;
+    
+  
     final int pressureSwitch = 4;
     final int compressorRelay = 1; 
+    
+   final int shiftUpButton = 3;
+   final int shiftDownButton = 2;
     
     Joystick leftStick = new Joystick(1);
     Joystick rightStick = new Joystick(2);
@@ -63,7 +68,7 @@ public class alan extends SimpleRobot {
     Talon backRightTalon = new Talon(backRightTalonPort);
     Talon backLeftTalon = new Talon(backLeftTalonPort);
     
-    RobotDrive chassis = new RobotDrive(frontLeftTalon, backLeftTalon, frontRightTalon, backLeftTalon);
+    RobotDrive chassis = new RobotDrive(frontLeftTalon, backLeftTalon, frontRightTalon, backRightTalon);
     
     Compressor air = new Compressor(pressureSwitch, compressorRelay);
     public void robotInit() {
@@ -85,6 +90,13 @@ public class alan extends SimpleRobot {
         while(isOperatorControl() && isEnabled()) {
             chassis.tankDrive(leftStick, rightStick);
             Timer.delay(0.01);
+            if(leftStick.getRawButton(shiftUpButton) || rightStick.getRawButton(shiftUpButton)) {
+                //shift up solenoids
+            }
+            if(leftStick.getRawButton(shiftDownButton) || rightStick.getRawButton(shiftDownButton)) {
+                //shift down solenoids
+            }
+            
         }
     }
     
