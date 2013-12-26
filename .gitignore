@@ -2,9 +2,11 @@
 build
 *.class
 *.xml
+nbproject
 # Package files #
 *.jar
 *.war
 *.ear
 # OS files #
 *.DS_Store
+__MACOSX
