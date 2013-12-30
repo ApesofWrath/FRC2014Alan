@@ -240,30 +240,37 @@ public class alan extends SimpleRobot {
 		DigitalInput di = new DigitalInput(1);
 		Solenoid s = new Solenoid(1);
 		Relay r = new Relay(1);
+		//as long as i is less than or equal to the maximum number of channels of any single type 
 		for (int i = 1; i <= Math.max(Math.max(Math.max(DriverStationLCD.kAnalogChannels, DriverStationLCD.kDigitalChannels), Math.max(DriverStationLCD.kSolenoidChannels, DriverStationLCD.kRelayChannels)), DriverStationLCD.kPwmChannels); i++) {
+			//if i is less than or equal to the number of PWMChannels, test to see if a new instance of a Talon can be made 
 			if (i <= DriverStationLCD.kPwmChannels) {
 				pwm = new Talon(i);
 				pwm.set(0.3);
 				cnt[0] = i;
 			}
+			//if i is less than or equal to the number of AnalogChannels, test to see if a new instance of an AnalogChannel can be made 
 			if (i <= DriverStationLCD.kAnalogChannels) {
 				ac = new AnalogChannel(i);
 				cnt[1] = i;
 			}
+			//if i is less than or equal to the number of DigitalChannels, test to see if a new instance of a DigitalInput can be made 
 			if (i <= DriverStationLCD.kDigitalChannels) {
 				di = new DigitalInput(i);
 				cnt[2] = i;
 			}
+			//if i is less than or equal to the number of RelayChannels, test to see if a new instance of a Relay can be made 
 			if (i <= DriverStationLCD.kRelayChannels) {
 				r = new Relay(i);
 				r.set(Relay.Value.kForward);
 				cnt[3] = i;
 			}
+			//if i is less than or equal to the number of RelayChannels, test to see if a new instance of a Solenoid can be made 
 			if (i <= DriverStationLCD.kRelayChannels) {
 				s = new Solenoid(i);
 				s.set(true);
 				cnt[4] = i;
 			}
+			//print values
 			dslcd.println(DriverStationLCD.Line.kUser1, 1, "i: " + String.valueOf(i));
 			dslcd.println(DriverStationLCD.Line.kUser2, 1, "pwm " + String.valueOf(cnt[0]) + ": " + String.valueOf(pwm.get()));
 			dslcd.println(DriverStationLCD.Line.kUser3, 1, "anlg " + String.valueOf(cnt[1]) + ": " + String.valueOf(ac.getValue()));
