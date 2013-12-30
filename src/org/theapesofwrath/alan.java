@@ -56,14 +56,18 @@ Any Button : enable the wheel
 
  package org.theapesofwrath;
 
+import edu.wpi.first.wpilibj.AnalogChannel;
  import edu.wpi.first.wpilibj.SimpleRobot;
  import edu.wpi.first.wpilibj.Joystick;
  import edu.wpi.first.wpilibj.RobotDrive;
  import edu.wpi.first.wpilibj.Talon;
  import edu.wpi.first.wpilibj.Timer;
  import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStationLCD;
  import edu.wpi.first.wpilibj.Encoder;
  import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Relay;
  import edu.wpi.first.wpilibj.Solenoid;
  import edu.wpi.first.wpilibj.SpeedController;
  import edu.wpi.first.wpilibj.camera.AxisCamera;
@@ -112,13 +116,6 @@ public class alan extends SimpleRobot {
  final double MOTOR_STOP = 0.0;
  final double RPM_CONV_PULSE = 60.0 / 24.0 * 1.0 / 128.0 * 60.0; // Gear Ratio * 1/(ticks per Rev.) * 60 sec/min
  
-//only for state machine, but outside so they persist over multiple instances of the loop
- int remainingFrisbees = 4;
-//shootingState for state machine
- int shootingState = start;
-//shootingMode determines route for cases within state machine
- int shootingMode = noMode;
-
 //joysticks
  Joystick leftStick = new Joystick(1);
  Joystick rightStick = new Joystick(2);
@@ -160,7 +157,7 @@ public class alan extends SimpleRobot {
   public void pidWrite(double output) {
 	set(output);
    }
- }//end shooterMotorVirtual
+ };//end shooterMotorVirtual
  
  Encoder shooterEncoder = new Encoder(shooterEncoderA, shooterEncoderB);
  
@@ -179,13 +176,20 @@ public class alan extends SimpleRobot {
 //state machine, should be enum
  final int start = 0, idle = 1, startShooterMotor = 2,
  shooterMotorSpinupWait = 3, extendCylinder = 4,
- extendCylinderWait = 5, retractCylinder = 6
+ extendCylinderWait = 5, retractCylinder = 6,
  retractCylinderWait = 7, checkFrisbeeCount = 8,
  stopShooterMotor = 9, shooterCheckTrigger = 10,
  setAutoShoot = 11, setManualShoot = 12, setDumpShoot = 13;
  final int dump = 0, manualShoot = 1, autoShoot = 2,
  autonomous = 3, noMode = 4;
  
+//only for state machine, but outside so they persist over multiple instances of the loop
+ int remainingFrisbees = 4;
+//shootingState for state machine
+ int shootingState = start;
+//shootingMode determines route for cases within state machine
+ int shootingMode = noMode;
+
  Timer shooterTimer = new Timer();
  
 /* PID
@@ -197,7 +201,7 @@ SampleRate (s): .729 / 5 * (1.0 - 0.001) + 0.001 = .1467 seconds
 */
  double kP = 0.070, kI = 0.000, kD = 0.500, sampleRate = .1467;
  int rpm, target;
- PIDController shooterPID = new PIDController(kP, kI, kI, shooterEncoder, shooterMotorVirtual, sampleRate)
+ PIDController shooterPID = new PIDController(kP, kI, kI, shooterEncoder, shooterMotorVirtual, sampleRate);
  
  AxisCamera camera = AxisCamera.getInstance("10.6.68.11");
  
@@ -271,7 +275,7 @@ SampleRate (s): .729 / 5 * (1.0 - 0.001) + 0.001 = .1467 seconds
  pause.reset();
  pause.start();
 // go for 1 second
-  while (pause.get() < 1.0);{
+  while (pause.get() < 1.0){
    pause.stop();
    pwm.set(0.0);
    s.set(false);
@@ -285,6 +289,7 @@ SampleRate (s): .729 / 5 * (1.0 - 0.001) + 0.001 = .1467 seconds
    r.free();
 //reclaims memory of the test objects that were created
    System.gc();
+  } // end For loop
  }//end test
 
 // handle the shifting and lifting of the shooter
@@ -333,7 +338,6 @@ SampleRate (s): .729 / 5 * (1.0 - 0.001) + 0.001 = .1467 seconds
   default:
   shootingState = start;
   break;
-  }//end switch 
 
 //start to idle
  case start:
@@ -388,11 +392,13 @@ shootingState = idle;
    if (shootingMode == dump) {
      shooterTimer.reset();
      shootingState = shooterMotorSpinupWait;
+   }//end if (dump)
 /* for manual shooting, the operator has to set the shooter motor speed manually. 
 It is expected that the operator will wait for spinup before pulling the trigger*/
    if (shootingMode == manualShoot) {
     shootingState = shooterCheckTrigger;
    }
+   
  break;
 
 //from startShooterMotor to extendCylinder
